@@ -1086,7 +1086,7 @@ input, select, textarea {
 /* MENU */
 
 	
-	#overlay #nav1 {
+	#main #nav1 {
 		background: rgba(13, 137, 254, 0.418);
 		bottom: 0;
 		box-shadow: 0 0 5px rgb(13, 137, 254);
@@ -1100,7 +1100,7 @@ input, select, textarea {
 		user-select: none;
 	}
 	
-	#overlay #nav1 a {
+	#main #nav1 a {
 		color: #eee;
 		display: block;
 		padding: 12px 16px;
@@ -1109,18 +1109,18 @@ input, select, textarea {
 		-webkit-user-drag: none;
 	}
 	
-	#overlay #nav1 a:hover {
+	#main #nav1 a:hover {
 		background-color: rgba(189, 194, 189, 0.671);
 	}
 	
-	#overlay #nav-collapse1 {
+	#main #nav-collapse1 {
 		padding: 8px 12px;
 		position: absolute;
 		right: 0;
 		top: 0;
 	}
 	
-	#overlay #nav-expand1 {
+	#main #nav-expand1 {
 		background-color: rgb(13, 137, 254);
 		color: #eee;
 		display: block;
@@ -1134,7 +1134,7 @@ input, select, textarea {
 		-webkit-user-drag: none;
 	}
 	
-	#overlay #nav-expand1:focus {
+	#main #nav-expand1:focus {
 		opacity: 0;
 	}
 	
@@ -1143,12 +1143,12 @@ input, select, textarea {
 		transition-delay: .25s;
 	}
 	
-	#overlay #nav-expand1:focus ~ nav {
+	#main #nav-expand1:focus ~ nav {
 		left: 0;
 		transition-delay: .25s;
 	}
 	
-	#overlay #nav-expand1:hover {
+	#main #nav-expand1:hover {
 		background-color: #369;
 		color: #fff;
 	}
