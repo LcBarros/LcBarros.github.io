@@ -13,13 +13,14 @@
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 		<style>
 			.mycode{
-				display: block;
+				display: table;
+				table-layout: fixed;
 				font-size: 14px; 
 				line-height: 20px;
-				width: 100em;
-				background-color: #333;
-				font-family: arial;
-				color: #f7f7f7;
+				width: 100%;
+				background-color: #101010;
+				font-family: 'Courier New', Courier, monospace;
+				color: #0acd1a;
 				font-weight: bold;
 			}
 		</style>
@@ -50,12 +51,13 @@
 								<p>Este projeto visa aplicar os conceitos de ETL (Extract, Transform e Load) e análise de dados utilizando python, sobre os dados de crédito do portal IF.data de Conglomerados Financeiros e Instituições Independentes.
 								<br>
 								<br>Perguntas a serem respondidas:
-								<br>#Q1 - Maiores instituições - PF/PJ
-								<br>#Q2 - Principais produtos e respectivas taxa de inadimplência - PF/PJ
-								<br>#Q3 - Obter a relevância de operação de cartão de crédito para PF
-								<br>#Q4 - Qual produto para PJ mais relevante
-								<br>
-								<br><i>Os dados aqui divulgados são de caracter público e disponíveis no portal IF.data (https://www3.bcb.gov.br/ifdata/).	
+								<ul>
+								<li>Q1 - Maiores instituições - PF/PJ</li>
+								<li>Q2 - Principais produtos e respectivas taxa de inadimplência - PF/PJ</li>
+								<li>Q3 - Obter a relevância de operação de cartão de crédito para PF</li>
+								<li>Q4 - Qual produto para PJ mais relevante</li>
+								</ul>
+								<i>Os dados aqui divulgados são de caracter público e disponíveis no portal IF.data (https://www3.bcb.gov.br/ifdata/).	
 								<br>Sobre o IF.data: Trimestralmente o Banco central divulga informações de instituições em operação e regulamentadas por ele. Dentre as informações divulgadas tem-se a posição de 
 								crédito para pessoa física (PF) e pessoa jurídica (PJ), operações de cambio, informações contábeis e de capital, assim como informações de segmentação.</i>
 								</p>
@@ -71,15 +73,17 @@
 									<p>Neste projeto a ideia central do processo de ETL é gerar um repositorio (banco de dados) de tabelas relacionais que facilitem analises futuras. O conceito pode 
 										ser entendido como ETL moderno para criação de Data Warehouse, ou seja, visa a criação de um banco com tabelas relacionais e estruturadas a perguntas já definidas.
 									<br>Buscando projetar cada etapa, temos que:
-									<br># O portal fornece uma API onde podemos coletar os dados, sem ter a necessidade de acessar a página web e fazer o download de arquivos;
-									<br># A tabela obtida contém linhas e colunas que não serão usadas como 'agrupadores (total)' e indices;
-									<br># Os dados obtidos deverão ser armazenados em um banco relacional (no caso, utilizando Postgres).
+									<ul>
+									<li>O portal fornece uma API onde podemos coletar os dados, sem ter a necessidade de acessar a página web e fazer o download de arquivos;</li>
+									<li>A tabela obtida contém linhas e colunas que não serão usadas como 'agrupadores (total)' e indices;</li>
+									<li>Os dados obtidos deverão ser armazenados em um banco relacional (no caso, utilizando Postgres).</li>
+									</ul>
 									</p>
 								</div>
 						</section>
 						<section>
 								<div class="inner">
-									<h2>Bibliotecas utilizadas</h2>
+									<h3>Bibliotecas utilizadas</h3>
 									<p>Para as etapas de ETL serão utilizadas as bibliotecas abaixo: </p>
 									<pre class="mycode">
 										<code>
@@ -95,12 +99,14 @@ from sqlalchemy import create_engine ## responsável por converter o dataframe d
 						</section>
 						<section>
 								<div class="inner">
-									<h2>Extract</h2>
+									<h3>Extract</h3>
 									<p>O ponto central desta etapa é entender a documentação para acesso aos dados, fornecido pelo portal IF.data (https://olinda.bcb.gov.br/olinda/servico/IFDATA/versao/v1/documentacao#IfDataValores) e 
 										aplicar a parametrização correta da biblioteca 'Requests' que foi a utilizada para realizar a comunicação com a API.
 									<br>Relatórios extraídos:
-									<br>#11 - Carteira de crédito ativa Pessoa Física - modalidade e prazo de vencimento 
-									<br>#13 - Carteira de crédito ativa Pessoa Jurídica - modalidade e prazo de vencimento
+									<ul>
+									<li>11 - Carteira de crédito ativa Pessoa Física - modalidade e prazo de vencimento </li>
+									<li>13 - Carteira de crédito ativa Pessoa Jurídica - modalidade e prazo de vencimento</li>
+									</ul>
 									<br>
 									<br><i>A extração dos dois relatórios é realizada separadamente, mas com etapas semelhantes.</i>
 									</p>
@@ -134,13 +140,15 @@ else:
 						</section>
 						<section>
 								<div class="inner">
-									<h2>Transform</h2>
+									<h3>Transform</h3>
 									<p>A partir do json recebido pela etapa anterior (extração), mapeou-se as seguintes necessidades:
-									<br># Normalizar o json recebido (semi estruturado), retirando a chave 'value' que contem os dados a serem utilizados
-									<br># A partir da biblioteca pandas, mapear as colunas a serem mantidas
-									<br># Dropar linhas não utilizadas
-									<br># Formatar colunas visando padronização
-									<br># Renomear colunas para a etapa de envio ao banco de dados
+									<ul>
+									<li>Normalizar o json recebido (semi estruturado), retirando a chave 'value' que contem os dados a serem utilizados;</li>
+									<li>A partir da biblioteca pandas, mapear as colunas a serem mantidas;</li>
+									<li>Dropar linhas não utilizadas;</li>
+									<li>Formatar colunas visando padronização;</li>
+									<li>Renomear colunas para a etapa de envio ao banco de dados;</li>
+									</ul>
 									</p>
 
 									<pre class="mycode">
@@ -173,7 +181,7 @@ df2 = df2.rename(columns={'CodInst': 'codinst', 'AnoMes': 'anomes', 'Grupo': 'gr
 						</section>
 						<section>
 								<div class="inner">
-									<h2>Load</h2>
+									<h3>Load</h3>
 									<pre class="mycode">
 										<code>
 #Armazenamento
@@ -271,9 +279,11 @@ df2.to_sql('ifdata_pf', engine, if_exists='append', index=False)
 								<br> A etapa que exigiu maior atenção foi a extração dos dados da API do portal IF.data, devido as variáveis requisitadas para a obtenção dos dados e a leitura 
 								do json recebido. 
 								<br> Avaliando pontos de melhorias futuras, temos:
-								<br># Mapear o relatório responsável pelo nome das instituições para facilitar análises;
-								<br># Levar análise de dados para um painel (BI), expandindo a análise para a série histórica;
-								<br># Criar um pipeline dos dados para automatizar o processo de ETL, conforme divulgação dos resultados (trimestral), utilizando Airflow e refinando os scripts em python.								
+								<ul>
+								<li>Mapear o relatório responsável pelo nome das instituições para facilitar análises;</li>
+								<li>Levar análise de dados para um painel (BI), expandindo a análise para a série histórica;</li>
+								<li>Criar um pipeline dos dados para automatizar o processo de ETL, conforme divulgação dos resultados (trimestral), utilizando Airflow e refinando os scripts em python.</li>							
+								</ul>
 							</p>
 						</div>
 						</section>

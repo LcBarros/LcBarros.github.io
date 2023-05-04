@@ -169,11 +169,13 @@ input, select, textarea {
 	}
 
 	em, i {
+		color: #000000;
 		font-style: italic;
 	}
 
 	p {
-		margin: 0 0 2em 0;
+		color: #000000;
+		margin: 0 0 1 0;
 	}
 
 	h1, h2, h3, h4, h5, h6 {
@@ -221,7 +223,8 @@ input, select, textarea {
 	}
 
 	h3 {
-		font-size: 1.1em;
+		color: #0acd1a;
+		font-size: 1.55em;
 	}
 
 	h4 {
@@ -298,6 +301,7 @@ input, select, textarea {
 		font-family: "Courier New", monospace;
 		font-size: 0.9em;
 		margin: 0 0 2em 0;
+		
 	}
 
 		pre code {
@@ -2628,8 +2632,9 @@ input, select, textarea {
 		}
 
 	ul {
+		color:#000000;
 		list-style: disc;
-		margin: 0 0 2em 0;
+		margin: 0 0 0.5em 0;
 		padding-left: 1em;
 	}
 
@@ -3050,6 +3055,7 @@ input, select, textarea {
 			-ms-justify-content: center;
 			justify-content: center;
 			width: 50em;
+			height: auto;
 			-ms-flex: 1;
 		}
 
@@ -3203,13 +3209,14 @@ input, select, textarea {
 		.wrapper > .inner {
 			padding: 5em 5em 3em 5em ;
 			max-width: 100%;
-			width: 75em;
+			width: 100%
 		}
 
 			@media screen and (max-width: 1680px) {
 
 				.wrapper > .inner {
 					padding: 4em 4em 2em 4em ;
+					width: 100%;
 				}
 
 			}
@@ -3226,6 +3233,7 @@ input, select, textarea {
 
 				.wrapper > .inner {
 					padding: 3em 2em 1em 2em ;
+					width: 100%;
 				}
 
 			}
@@ -3466,7 +3474,7 @@ input, select, textarea {
 		@media screen and (max-width: 1280px) {
 
 			#sidebar + #wrapper {
-				margin-left: 0;
+				margin-left: 0.5em;
 				padding-top: 3.5em;
 			}
 
@@ -3475,6 +3483,7 @@ input, select, textarea {
 		@media screen and (max-width: 736px) {
 
 			#sidebar + #wrapper {
+				margin-left: 0.5em;
 				padding-top: 0;
 			}
 
