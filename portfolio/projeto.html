@@ -57,9 +57,11 @@
 								<li>Q3 - Obter a relevância de operação de cartão de crédito para PF</li>
 								<li>Q4 - Qual produto para PJ mais relevante</li>
 								</ul>
-								<i>Os dados aqui divulgados são de caracter público e disponíveis no portal IF.data (https://www3.bcb.gov.br/ifdata/).	
+								<br><i>Os dados aqui divulgados são de caracter público e disponíveis no portal IF.data (https://www3.bcb.gov.br/ifdata/).	
 								<br>Sobre o IF.data: Trimestralmente o Banco central divulga informações de instituições em operação e regulamentadas por ele. Dentre as informações divulgadas tem-se a posição de 
 								crédito para pessoa física (PF) e pessoa jurídica (PJ), operações de cambio, informações contábeis e de capital, assim como informações de segmentação.</i>
+								<br>
+								<br>
 								</p>
 							</div>
 						</section>
@@ -68,18 +70,18 @@
 				<!-- One -->
 					<section id="one" class="wrapper style2 spotlights">
 						<section>
-								<div class="inner">
-									<h2>ETL</h2>
-									<p>Neste projeto a ideia central do processo de ETL é gerar um repositorio (banco de dados) de tabelas relacionais que facilitem analises futuras. O conceito pode 
-										ser entendido como ETL moderno para criação de Data Warehouse, ou seja, visa a criação de um banco com tabelas relacionais e estruturadas a perguntas já definidas.
-									<br>Buscando projetar cada etapa, temos que:
-									<ul>
-									<li>O portal fornece uma API onde podemos coletar os dados, sem ter a necessidade de acessar a página web e fazer o download de arquivos;</li>
-									<li>A tabela obtida contém linhas e colunas que não serão usadas como 'agrupadores (total)' e indices;</li>
-									<li>Os dados obtidos deverão ser armazenados em um banco relacional (no caso, utilizando Postgres).</li>
-									</ul>
-									</p>
-								</div>
+							<div class="inner">
+								<h2>ETL</h2>
+								<p>Neste projeto a ideia central do processo de ETL é gerar um repositorio (banco de dados) de tabelas relacionais que facilitem analises futuras. O conceito pode 
+									ser entendido como ETL moderno para criação de Data Warehouse, ou seja, visa a criação de um banco com tabelas relacionais e estruturadas a perguntas já definidas.
+								<br>Buscando projetar cada etapa, temos que:
+								<ul>
+								<li>O portal fornece uma API onde podemos coletar os dados, sem ter a necessidade de acessar a página web e fazer o download de arquivos;</li>
+								<li>A tabela obtida contém linhas e colunas que não serão usadas como 'agrupadores (total)' e indices;</li>
+								<li>Os dados obtidos deverão ser armazenados em um banco relacional (no caso, utilizando Postgres).</li>
+								</ul><br>
+								</p>
+							</div>
 						</section>
 						<section>
 								<div class="inner">
@@ -107,7 +109,6 @@ from sqlalchemy import create_engine ## responsável por converter o dataframe d
 									<li>11 - Carteira de crédito ativa Pessoa Física - modalidade e prazo de vencimento </li>
 									<li>13 - Carteira de crédito ativa Pessoa Jurídica - modalidade e prazo de vencimento</li>
 									</ul>
-									<br>
 									<br><i>A extração dos dois relatórios é realizada separadamente, mas com etapas semelhantes.</i>
 									</p>
 									<pre class="mycode">
@@ -148,7 +149,7 @@ else:
 									<li>Dropar linhas não utilizadas;</li>
 									<li>Formatar colunas visando padronização;</li>
 									<li>Renomear colunas para a etapa de envio ao banco de dados;</li>
-									</ul>
+									</ul><br>
 									</p>
 
 									<pre class="mycode">
@@ -182,6 +183,14 @@ df2 = df2.rename(columns={'CodInst': 'codinst', 'AnoMes': 'anomes', 'Grupo': 'gr
 						<section>
 								<div class="inner">
 									<h3>Load</h3>
+									<p>Com os dados limpos e padronizados, podemos avançar e armazena-los dentro de uma estrutura para consultas futuras.
+										Dentre as opções de armazenamento, foi utilizado duas para este projeto:
+										<ul>
+											<li>CSV - arquivo de texto, com valores separados por vírgula. <i>Indicado para facilitar a troca entre ferramentas, volumes pequenos e cenários pontuais</i> </li>
+											<li>SQL - Postgres - software de banco de dados, que permite armazenar dados e criar regras de acesso e modificação. <i>Indicado para cenários rotineiros e que exigem padronização e governança dos dados capturados</i></li>
+										</ul>
+										<br>
+									</p>
 									<pre class="mycode">
 										<code>
 #Armazenamento
@@ -247,18 +256,19 @@ df2.to_sql('ifdata_pf', engine, if_exists='append', index=False)
 							<h2>Análise</h2>
 							<p>Para a análise dos dados foi utilizado um notebook virtual - Jupyter (para facilitar a visualização das etapas), com as bibliotecas pandas e numpy.
 							<br>A fim de explorar ainda mais conceitos a análise de pessoa física partiu do formato csv do ETL e a análise de pessoa jurídica da tabela sql.
+							<br>
 							<br>	
 							</p>
 							<h3>Análise PF</h3>
-							<img src="../portfolio/images/analise_pf_1.jpg" alt="" class="zoomE">
-							<img src="../portfolio/images/analise_pf_2.jpg" alt="" class="zoomE">
-							<img src="../portfolio/images/analise_pf_3.jpg" alt="" class="zoomE">
-							<img src="../portfolio/images/analise_pf_4.jpg" alt="" class="zoomE">
+							<img src="../portfolio/images/analise_pf_1.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pf_2.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pf_3.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pf_4.jpg" alt="" class="zoomE" style="max-width: 100%">
 							<br>
 							<h3>Análise PJ</h3>
-							<img src="../portfolio/images/analise_pj_1.jpg" alt="" class="zoomE">
-							<img src="../portfolio/images/analise_pj_2.jpg" alt="" class="zoomE">
-							<img src="../portfolio/images/analise_pj_3.jpg" alt="" class="zoomE">
+							<img src="../portfolio/images/analise_pj_1.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pj_2.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pj_3.jpg" alt="" class="zoomE" style="max-width: 100%">
 						</div>
 						</section>
 					</section>
@@ -269,9 +279,12 @@ df2.to_sql('ifdata_pf', engine, if_exists='append', index=False)
 						<div class="inner">
 							<h2>Conclusão</h2>
 							<h3>Resultados</h3>
-							<p>
-								<img src="../portfolio/images/resposta_pf.jpg" alt="" class="zoomE">
-								<img src="../portfolio/images/resposta_pj.jpg" alt="" class="zoomE">
+							<p>As respostas para as perguntas tomam com base seus respectivos dataframes gerados na etapa de análise. Assim, 
+								para o período analisado (dados de 12/2022), temos:
+								<br>
+								<br>
+								<img src="../portfolio/images/resposta_pf.jpg" alt="" class="zoomE" style="max-width: 100%">
+								<img src="../portfolio/images/resposta_pj.jpg" alt="" class="zoomE" style="max-width: 100%">
 							</p>
 							<br>
 							<h3>Considerações</h3>
