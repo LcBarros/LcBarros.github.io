@@ -1,0 +1,310 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Projeto 1  - ETL e Analise com Python</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			.mycode{
+				display: table;
+				table-layout: fixed;
+				font-size: 14px; 
+				line-height: 20px;
+				width: 100%;
+				background-color: #101010;
+				font-family: 'Courier New', Courier, monospace;
+				color: #0acd1a;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+							<li><a href="#intro">Escopo</a></li>
+							<li><a href="#one">ETL</a></li>
+							<li><a href="#two">Análise</a></li>
+							<li><a href="#three">Conclusão</a></li>
+						</ul>
+					</nav>
+				</div>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+				<!-- Intro -->
+					<section id="intro" class="wrapper style2 spotlights">
+						<section>
+							<div class="inner">
+								<h2>Projeto 1 - ETL e Análise de dados do portal IF.data - PF/PJ</h2>
+								<p>Este projeto visa aplicar os conceitos de ETL (Extract, Transform e Load) e análise de dados utilizando python, sobre os dados de crédito do portal IF.data de Conglomerados Financeiros e Instituições Independentes.
+								<br>
+								<br>Perguntas a serem respondidas:
+								<ul>
+								<li>Q1 - Maiores instituições - PF/PJ</li>
+								<li>Q2 - Principais produtos e respectivas taxa de inadimplência - PF/PJ</li>
+								<li>Q3 - Obter a relevância de operação de cartão de crédito para PF</li>
+								<li>Q4 - Qual produto para PJ mais relevante</li>
+								</ul>
+								<br><i>Os dados aqui divulgados são de caracter público e disponíveis no portal IF.data (https://www3.bcb.gov.br/ifdata/).	
+								<br>Sobre o IF.data: Trimestralmente o Banco central divulga informações de instituições em operação e regulamentadas por ele. Dentre as informações divulgadas tem-se a posição de 
+								crédito para pessoa física (PF) e pessoa jurídica (PJ), operações de cambio, informações contábeis e de capital, assim como informações de segmentação.</i>
+								<br>
+								<br>
+								</p>
+							</div>
+						</section>
+					</section>
+
+				<!-- One -->
+					<section id="one" class="wrapper style2 spotlights">
+						<section>
+							<div class="inner">
+								<h2>ETL</h2>
+								<p>Neste projeto a ideia central do processo de ETL é gerar um repositorio (banco de dados) de tabelas relacionais que facilitem analises futuras. O conceito pode 
+									ser entendido como ETL moderno para criação de Data Warehouse, ou seja, visa a criação de um banco com tabelas relacionais e estruturadas a perguntas já definidas.
+								<br>Buscando projetar cada etapa, temos que:
+								<ul>
+								<li>O portal fornece uma API onde podemos coletar os dados, sem ter a necessidade de acessar a página web e fazer o download de arquivos;</li>
+								<li>A tabela obtida contém linhas e colunas que não serão usadas como 'agrupadores (total)' e indices;</li>
+								<li>Os dados obtidos deverão ser armazenados em um banco relacional (no caso, utilizando Postgres).</li>
+								</ul><br>
+								</p>
+								<iframe title="Report Section" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiOGUyNWQ4ODQtYjQ5Zi00Y2VkLWJhYTAtZjU2ZjlkOGNlYmQyIiwidCI6IjAxYzQ3YjQxLWRiNjMtNDExNy05YjUxLWNjZDVkZDhiZWJiYiJ9" frameborder="0" allowFullScreen="true"></iframe>
+							</div>
+						</section>
+						<section>
+								<div class="inner">
+									<h3>Painel - Power BI</h3>
+									<p> </p>
+									<br>
+								</div>
+						</section>
+						<section>
+								<div class="inner">
+									<h3>Extract</h3>
+									<p>O ponto central desta etapa é entender a documentação para acesso aos dados, fornecido pelo portal IF.data (https://olinda.bcb.gov.br/olinda/servico/IFDATA/versao/v1/documentacao#IfDataValores) e 
+										aplicar a parametrização correta da biblioteca 'Requests' que foi a utilizada para realizar a comunicação com a API.
+									<br>Relatórios extraídos:
+									<ul>
+									<li>11 - Carteira de crédito ativa Pessoa Física - modalidade e prazo de vencimento </li>
+									<li>13 - Carteira de crédito ativa Pessoa Jurídica - modalidade e prazo de vencimento</li>
+									</ul>
+									<br><i>A extração dos dois relatórios é realizada separadamente, mas com etapas semelhantes.</i>
+									</p>
+									<pre class="mycode">
+										<code>
+#Extração
+# definição da api-endpoint
+URL = "https://olinda.bcb.gov.br/olinda/servico/IFDATA/versao/v1/odata/IfDataValores(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao,Relatorio=@Relatorio)"
+
+# configurando parametros obrigatórios da api
+PARAMS = {
+	'@AnoMes': 202212, #YYYYMM
+	'@TipoInstituicao': 2, #Tipo de Instituição: 1 - Conglomerados Prudenciais e Instituições Independentes, 2 - Conglomerados Financeiros e Instituições Independentes, 3 - Instituições Individuais, 4 - Instituições com Operações de Câmbio
+	'@Relatorio': "\'11\'", # Carteira de crédito ativa Pessoa Física - modalidade e vencimento
+	'$format': 'json'
+}
+
+# chamando função GET e gravando resultado em um objeto
+r = requests.get(url = URL, params = PARAMS)
+
+# analisa de o método GET obteve sucesso
+# em caso de erro retorna o código do erro
+if r.status_code == 200:
+	print(r.text)
+else:
+	print(f"Error: {r.status_code}")
+	r.raise_for_status()
+										</code>
+									</pre>
+								</div>
+						</section>
+						<section>
+								<div class="inner">
+									<h3>Transform</h3>
+									<p>A partir do json recebido pela etapa anterior (extração), mapeou-se as seguintes necessidades:
+									<ul>
+									<li>Normalizar o json recebido (semi estruturado), retirando a chave 'value' que contem os dados a serem utilizados;</li>
+									<li>A partir da biblioteca pandas, mapear as colunas a serem mantidas;</li>
+									<li>Dropar linhas não utilizadas;</li>
+									<li>Formatar colunas visando padronização;</li>
+									<li>Renomear colunas para a etapa de envio ao banco de dados;</li>
+									</ul><br>
+									</p>
+
+									<pre class="mycode">
+										<code>
+#Tranformação
+# Transforma a resposta da API de text em dicionario, padrão json
+data = r.json()
+# Normaliza o json semi estruturado
+# Extrai apenas o dicionario da chave 'value'
+multiple_level_data = pd.json_normalize(data, record_path =['value'])
+
+# Monta um dataframe a partir do JSON
+df = pd.DataFrame.from_dict(multiple_level_data)
+
+# Limpeza e tratamento de colunas
+df2 = pd.DataFrame(df, columns= ['CodInst', 'AnoMes', 'Grupo', 'NomeColuna', 'Saldo'])
+
+df2['NomeColuna'] = df2['NomeColuna'].str.upper()
+df2['AnoMes'] = pd.to_datetime(df2['AnoMes'], format='%Y%m')
+df2['Saldo'] = df2['Saldo'].round(2)
+
+# Limpeza das linhas excedentes
+df2 = df2[df2["NomeColuna"].str.contains("TOTAL") == False]
+
+# Ajuste no nome das colunas para o script levar ao banco de dados
+df2 = df2.rename(columns={'CodInst': 'codinst', 'AnoMes': 'anomes', 'Grupo': 'grupo', 'NomeColuna': 'nomecoluna', 'Saldo': 'saldo'})
+										</code>
+									</pre>
+								</div>
+						</section>
+						<section>
+								<div class="inner">
+									<h3>Load</h3>
+									<p>Com os dados limpos e padronizados, podemos avançar e armazena-los dentro de uma estrutura para consultas futuras.
+										Dentre as opções de armazenamento, foi utilizado duas para este projeto:
+										<ul>
+											<li>CSV - arquivo de texto, com valores separados por vírgula. <i>Indicado para facilitar a troca entre ferramentas, volumes pequenos e cenários pontuais</i> </li>
+											<li>SQL - Postgres - software de banco de dados, que permite armazenar dados e criar regras de acesso e modificação. <i>Indicado para cenários rotineiros e que exigem padronização e governança dos dados capturados</i></li>
+										</ul>
+										<br>
+									</p>
+									<pre class="mycode">
+										<code>
+#Armazenamento
+# Para armazenamento em csv - local
+df2.to_csv('dados/IFDATA_PF_db.csv', sep = ';')
+
+# Para levar informações ao postgreSQL - local
+
+hostname = 'localhost'
+database = 'dev_lucas'
+username = 'postgres'
+pwd = 'admin'
+port_id = 5432
+conn = None
+cur = None
+
+engine = create_engine('postgresql+psycopg2://' + username + ':' + pwd + '@' + hostname + '/' + database)
+
+# Criar tabela se ela não existir no db
+try:
+	conn = psycopg2.connect(
+		host = hostname,
+		dbname = database,
+		user = username,
+		password = pwd,
+		port = port_id
+		)
+
+	cur = conn.cursor()
+
+	create_script = ''' CREATE TABLE IF NOT EXISTS ifdata_pf (
+							CodInst         VARCHAR NOT NULL,
+							AnoMes          date NOT NULL,
+							Grupo           VARCHAR NOT NULL,
+							NomeColuna      VARCHAR NOT NULL,
+							Saldo           float  ) '''
+	cur.execute(create_script)
+	cur.close()
+
+	conn.commit()
+
+except Exception as error:
+	print(error)
+
+finally:
+	if cur is not None:
+		cur.close()
+	if conn is not None:
+		conn.close()
+
+# Inserir os dados dentro da tabela criada
+df2.to_sql('ifdata_pf', engine, if_exists='append', index=False)
+										</code>
+									</pre>
+								</div>
+						</section>
+					</section>
+
+				<!-- Two -->
+					<section id="two"  class="wrapper style2 spotlights">
+						<section>
+						<div class="inner">
+							<h2>Análise</h2>
+							<p>Para a análise dos dados foi utilizado um notebook virtual - Jupyter (para facilitar a visualização das etapas), com as bibliotecas pandas e numpy.
+							<br>A fim de explorar ainda mais conceitos a análise de pessoa física partiu do formato csv do ETL e a análise de pessoa jurídica da tabela sql.
+							<br>
+							<br>	
+							</p>
+							<h3>Análise PF</h3>
+							<img src="../portfolio/images/analise_pf_1.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pf_2.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pf_3.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pf_4.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<br>
+							<h3>Análise PJ</h3>
+							<img src="../portfolio/images/analise_pj_1.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pj_2.jpg" alt="" class="zoomE" style="max-width: 100%">
+							<img src="../portfolio/images/analise_pj_3.jpg" alt="" class="zoomE" style="max-width: 100%">
+						</div>
+						</section>
+					</section>
+
+				<!-- Three -->
+					<section id="three"  class="wrapper style2 spotlights">
+						<section>
+						<div class="inner">
+							<h2>Conclusão</h2>
+							<h3>Resultados</h3>
+							<p>As respostas para as perguntas tomam com base seus respectivos dataframes gerados na etapa de análise. Assim, 
+								para o período analisado (dados de 12/2022), temos:
+								<br>
+								<br>
+								<img src="../portfolio/images/resposta_pf.jpg" alt="" class="zoomE" style="max-width: 100%">
+								<img src="../portfolio/images/resposta_pj.jpg" alt="" class="zoomE" style="max-width: 100%">
+							</p>
+							<br>
+							<h3>Considerações</h3>
+							<p>O projeto teve como foco a aplicação de técnicas de engenharia de dados (ETL) e técnicas de análise de dados (visualização de dados com ipynb).
+								<br> A etapa que exigiu maior atenção foi a extração dos dados da API do portal IF.data, devido as variáveis requisitadas para a obtenção dos dados e a leitura 
+								do json recebido. 
+								<br> Avaliando pontos de melhorias futuras, temos:
+								<ul>
+								<li>Mapear o relatório responsável pelo nome das instituições para facilitar análises;</li>
+								<li>Levar análise de dados para um painel (BI), expandindo a análise para a série histórica;</li>
+								<li>Criar um pipeline dos dados para automatizar o processo de ETL, conforme divulgação dos resultados (trimestral), utilizando Airflow e refinando os scripts em python.</li>							
+								</ul>
+							</p>
+						</div>
+						</section>
+					</section>
+
+			</div>
+
+		<!-- Footer -->
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
