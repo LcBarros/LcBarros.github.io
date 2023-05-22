@@ -74,8 +74,7 @@
                     <h3>Bibliotecas utilizadas</h3>
                     <p>Para as etapas de ETL serão utilizadas as bibliotecas abaixo: </p>
                     <br>
-                    <div>
-                        <pre>
+                        <pre style= "background-color: #101010; width: 100%">
                             <code>
         import requests ## responsável pela chamada da API do IFDATA
         import pandas as pd ## responsável pelos tratamentos necessários 
@@ -84,7 +83,6 @@
         from sqlalchemy import create_engine ## responsável por converter o dataframe do pandas para formato sql
                             </code>
                         </pre>
-                    </div>
                     <br>
                     <br>
 
@@ -99,6 +97,7 @@
                     <br><i>A extração dos dois relatórios é realizada separadamente, mas com etapas semelhantes.</i>
                     </p>
                     <br>
+                    <div>
                     <pre>
                         <code>
         #Extração
@@ -125,6 +124,7 @@
         r.raise_for_status()
                         </code>
                     </pre>
+                    </div>
                     <br>
                     <br>
 
@@ -139,7 +139,8 @@
                     </ul>
                     </p>
                     <br>
-                    <pre class="mycode">
+                    <div>
+                    <pre>
                         <code>
         #Tranformação
         # Transforma a resposta da API de text em dicionario, padrão json
@@ -165,6 +166,7 @@
         df2 = df2.rename(columns={'CodInst': 'codinst', 'AnoMes': 'anomes', 'Grupo': 'grupo', 'NomeColuna': 'nomecoluna', 'Saldo': 'saldo'})
                         </code>
                     </pre>
+                    </div>
                     <br>
                     <br>
 
@@ -177,6 +179,7 @@
                         </ul>
                     </p>
                     <br>
+                    <div>
                     <pre class="mycode">
                         <code>
         #Armazenamento
@@ -231,6 +234,7 @@
         df2.to_sql('ifdata_pf', engine, if_exists='append', index=False)
                         </code>
                     </pre>
+                    </div>
                     <br>
                     <br>
 

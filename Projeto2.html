@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <Title>Projeto 1</Title>
+    <Title>Projeto 2</Title>
     <link rel="stylesheet" type="text/css" href="css/style2.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,29 +62,332 @@
                     <br>
                     </p>
 
-                    <h2>ETL</h2>
-                    <p>	</p>
+                    <h2>Tabela - Relação de instituições</h3>
+                    <p>Dentro do portal If.data, a tradução dos códigos das instituições financeiras pode ser obtidas através da tabela 'Relação de instituições', conforme documentação abaixo:</p>
+                    <img src="/img/documentação_parametros.jpg" alt="" class="zoomE" style="max-width: 100%">
+                    <img src="/img/documentação_resultados.jpg" alt="" class="zoomE" style="max-width: 100%">
+                    <br>
+                    <p><i>Para obter o relatório o único parametro obrigatório é o 'AnoMes', pois a cada período a base de Instituições pode sofrem alterações.</i></p>
 
-                    <h3>Tabela - Relação de instituições</h3>
-                    <p> </p>
+                    <h2>ETL</h2>
+                    <p>Durante o projeto 1, foi codificado os scripts para captura dos dados referente a carteira de crédito para pessoa física e pessoa jurídica do portal If.data, entretanto, 
+                        apesar de funcionar, os scripts capturam apenas o período indicado no código (no caso, "12/2022"). Como um dos objetivos é olhar mais períodos, ficaria inviável (ou muito trabalhoso)
+                        rodar o codigo período a período desejado (teriamos que rodar 43 vez cada código, alterando apenas uma variável.. seriam 120 alterações!). Para ganhar performance e poder ganhar escala, os passos abaixo foram
+                        necessários:
+                    <ul>
+                    <li>Mapear as estapas repetidas dentro dos scripts e transforma-las em funções;</li>
+                    <li>Codificar um novo script que chama as funções para uma lista de períodos desejada;</li>
+                    <li>Alteramos o registro dos dados pf e pf para uma única tabela, criando uma coluna para distinguir o 'tipo da carteira';</li>
+                    <li>Como a tabela - relação de instituições é disponibilizada por período, também colocamos a captura dela no script acima.</li>
+                    </ul>
+                    <p>Desenvolvendo as etapas, foram mapeadas três funções: Extract, Transform e Load.
+                    </p>
+                    <div>
+                        <pre>
+                            <code>
+        import requests
+        import pandas as pd
+        import psycopg2
+        import psycopg2.extras #serve para poder chamar colunas pelo nome
+        from sqlalchemy import create_engine
+
+        def Extract(mesano, relatorio):
+            # Set api-endpoint
+            # Configura numero relatório
+            if relatorio == "codint":
+                URL = "https://olinda.bcb.gov.br/olinda/servico/IFDATA/versao/v1/odata/IfDataCadastro(AnoMes=@AnoMes)"
+                
+            else:
+                URL = "https://olinda.bcb.gov.br/olinda/servico/IFDATA/versao/v1/odata/IfDataValores(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao,Relatorio=@Relatorio)"
+                if relatorio == "pf":
+                    relatorio_numero = "\'11\'"
+                else:
+                    relatorio_numero = "\'13\'"
+
+            # configura os parametros obrigatórios da api
+            if relatorio == "codint":
+                PARAMS = {
+                '@AnoMes': mesano, #YYYYMM
+                '$format': 'json'
+                }
+            
+            else:
+                PARAMS = {
+                '@AnoMes': mesano, #YYYYMM
+                '@TipoInstituicao': 2, #Tipo de Instituição: 1 - Conglomerados Prudenciais e Instituições Independentes, 2 - Conglomerados Financeiros e Instituições Independentes, 3 - Instituições Individuais, 4 - Instituições com Operações de Câmbio
+                '@Relatorio': relatorio_numero, # Carteira de crédito ativa Pessoa Física - modalidade e vencimento
+                '$format': 'json'
+                }
+            
+            # chamando função GET e gravando resultado em um objeto
+            r = requests.get(url = URL, params = PARAMS)
+            
+            # analisa de o método GET obteve sucesso
+            # em caso de erro retorna o código do erro
+            if r.status_code == 200:
+                return(r)
+            else:
+                return("NOK")
+                            </code>
+                        </pre>
+                    </div>
+                    <br>
+                    <div>
+                        <pre>
+                            <code>
+        def Transform(relatorio, r):
+            try:
+                if relatorio == "codint":
+                    #Tranformação - codint
+                    # Transforma a resposta da API de text em dicionario, padrão json
+                    data = r.json()
+                    # Normalizar o json semi estruturado
+                    # Extraindo apenas o dicionario da chave 'value'
+                    multiple_level_data = pd.json_normalize(data, record_path =['value'])
+
+                    # Montando um dataframe a partir do JSON
+                    df = pd.DataFrame.from_dict(multiple_level_data)
+
+                    # Limpeza e tratamento de colunas
+                    df2 = pd.DataFrame(df, columns= ['CodInst', 'Data', 'NomeInstituicao', 'Atividade', 'CodConglomeradoFinanceiro', 'CodConglomeradoPrudencial', 'Situacao'])
+
+                    df2['Data'] = pd.to_datetime(df2['Data'], format='%Y%m')
+
+                    # Ajuste no nome das colunas para o script levar ao banco de dados
+                    df2 = df2.rename(columns={'CodInst': 'codinst', 'Data': 'anomes', 'NomeInstituicao': 'nomeinstituicao', 'Atividade': 'atividade', 'CodConglomeradoFinanceiro': 'codconglomeradofinanceiro',
+                                            'CodConglomeradoPrudencial': 'codconglomeradoprudencial', 'Situacao': 'situacao'})
+                    return(df2)
+                else:
+                    #Tranformação - pf e pj
+                    # Transforma a resposta da API de text em dicionario, padrão json
+                    data = r.json()
+                    # Normalizar o json semi estruturado
+                    # Extraindo apenas o dicionario da chave 'value'
+                    multiple_level_data = pd.json_normalize(data, record_path =['value'])
+
+                    # Montando um dataframe a partir do JSON
+                    df = pd.DataFrame.from_dict(multiple_level_data)
+
+                    # Limpeza e tratamento de colunas
+                    df2 = pd.DataFrame(df, columns= ['CodInst', 'AnoMes', 'Grupo', 'NomeColuna', 'Saldo'])
+
+                    df2['NomeColuna'] = df2['NomeColuna'].str.upper()
+                    df2['AnoMes'] = pd.to_datetime(df2['AnoMes'], format='%Y%m')
+                    df2['Saldo'] = df2['Saldo'].round(2)
+
+                    # Nova coluna para mapear tipo de carteira de crédito - para juntar os 2 relatorios na mesma tabela
+                    if relatorio == 'pf':
+                        df2['TipoCarteira'] = df.apply(lambda x: 'pf', axis=1)
+                    else:
+                        df2['TipoCarteira'] = df.apply(lambda x: 'pj', axis=1)
+
+                    # Limpeza linhas excedentes
+                    df2 = df2[df2["NomeColuna"].str.contains("TOTAL") == False]
+                    # Ajuste no nome das colunas para o script levar ao banco de dados
+                    df2 = df2.rename(columns={'CodInst': 'codinst', 'AnoMes': 'anomes', 'Grupo': 'grupo', 'NomeColuna': 'nomecoluna', 'Saldo': 'saldo', 'TipoCarteira': 'tipo_carteira'})
+                    return(df2)
+            except:
+                return("NOK")
+
+                            </code>
+                        </pre>
+                    </div>
+                    <br>
+                    <div>
+                        <pre>
+                            <code>
+        def Load(tabela, df2):
+            df2 = pd.DataFrame.from_records(df2)
+            try:
+                #Armazenamento
+                # Para levar informações ao postgreSQL - local
+
+                hostname = 'localhost'
+                database = 'dev_lucas'
+                username = 'postgres'
+                pwd = 'admin'
+                port_id = 5432
+                conn = None
+                cur = None
+
+                engine = create_engine('postgresql+psycopg2://' + username + ':' + pwd + '@' + hostname + '/' + database)
+
+                # Criar tabela se ela não existir no db
+                try:
+                    conn = psycopg2.connect(
+                        host = hostname,
+                        dbname = database,
+                        user = username,
+                        password = pwd,
+                        port = port_id
+                        )
+
+                    cur = conn.cursor()
+
+                    if tabela != "ifdata_codint":
+                        create_script = ''' CREATE TABLE IF NOT EXISTS  ''' + tabela + '''(
+                                                CodInst         VARCHAR NOT NULL,
+                                                AnoMes          date NOT NULL,
+                                                Grupo           VARCHAR NOT NULL,
+                                                NomeColuna      VARCHAR NOT NULL,
+                                                tipo_carteira    VARCHAR,
+                                                Saldo           float) '''    
+                    else:
+                        create_script = ''' CREATE TABLE IF NOT EXISTS ''' + tabela + ''' (
+                                    codinst                             VARCHAR NOT NULL,
+                                    anomes                              date NOT NULL,
+                                    nomeinstituicao                     VARCHAR,
+                                    atividade                           VARCHAR,
+                                    codconglomeradofinanceiro           VARCHAR,
+                                    codconglomeradoprudencial           VARCHAR,
+                                    situacao                            VARCHAR NOT NULL) ''' 
+
+                    cur.execute(create_script)
+                    cur.close()
+
+                    conn.commit()
+
+                except Exception as error:
+                    print(error)
+
+                finally:
+                    if cur is not None:
+                        cur.close()
+                    if conn is not None:
+                        conn.close()
+            except:
+                return("NOK")
+            
+            else:
+            # Insere os dados dentro da tabela criada
+
+                df2.to_sql(tabela, engine, if_exists='append', index=False)
+                return("OK")
+                            </code>
+                        </pre>
+                    </div>
+                    <br>
+                    <p><i>Parece grande, mas o resultado dentro do script final é notável.</i></p>
+                    <br>
                     <br>
 
-                    <h3>Série Histórica</h3>
-                    <p> </p>
+
+                    <h3>Script final</h3>
+                    <p>Com as funções codificadas, podemos chama-las dentro de qualquer novo script, fornecendo apenas os parametros
+                        necessários. Assim, para nosso caso, passamos:
+                    <ul>
+                    <li>Lista de períodos desejados;</li>
+                    <li>Qual relatório queremos extrair, tratar e compilar: pf, pj ou codint</li>
+                    <li>Resultados da etapa anterior (extract ou transform)</li>
+                    <li>Para controlar eventuais falhas foi colocada uma função para mapear resultados não desejados das funções.</li>
+                    </ul>
+
+                    <br>
+                    <div>
+                        <pre>
+                            <code>
+        from Projeto_IFDATA_Functions import Extract, Transform, Load
+
+        itens = [
+        "202303",
+        "202212", "202209", "202206", "202203", 
+        "202112", "202109", "202106", "202103", 
+        "202012", "202009", "202006", "202003", 
+        "201912", "201909", "201906", "201903", 
+        "201812", "201809", "201806", "201803", 
+        "201712", "201709", "201706", "201703", 
+        "201612", "201609", "201606", "201603", 
+        "201512", "201509", "201506", "201503", 
+        "201412", "201409", "201406", "201403", 
+        "201312", "201309", "201306", "201303"]
+
+        def valida_função(etapa, PF, PJ, CODINT):
+            if  PF == "NOK" or PJ == "NOK" or CODINT == "NOK":
+                print("ERRO" + etapa)
+                exit()
+            else: return
+
+        for i in itens:
+            E_pf = Extract(i, "pf")
+            E_pj = Extract(i, "pj")
+            E_codint = Extract(i, "codint")
+            valida_função("Extract", E_pf, E_pj, E_codint)
+
+            T_pf = Transform("pf", E_pf)
+            T_pj = Transform("pj", E_pj)
+            T_codint = Transform("codint", E_codint)
+
+            L_pf = Load("ifdata_carteira_credito", T_pf)
+            L_pj = Load("ifdata_carteira_credito", T_pj)
+            L_codint = Load("ifdata_codint", T_codint)
+
+            print(i + " - OK")
+                            </code>
+                        </pre>
+                    </div>
+                    </p>
+                    <br>
+                    <br>
 
                     <h2>Power BI</h2>
                     <p>A ferramenta de BI escolhida para este projeto é o Power BI. A ferramenta da Microsoft apresenta os principais recursos utilizados em visualização de dados,
                         como a exploração de dados e a construção de painéis interativos, além de possibilitar técnicas de análise aumentada (IA). Segundo o Gartner, o Power BI é enquadrado
                         como ferramenta lider de mercado, tanto pelos seus recursos e interatividades com os demais produtos da propria Microsoft, como também pelo seu preço em comparação aos demais. <br>
-                        <img src="../portfolio/images/BI_magic_quadrant.jpg" alt="" class="zoomE" style="max-width: 100%">
+                        <br>
+                        <img src="/img/BI_magic_quadrant.jpg" alt="" class="zoomE" style="max-width: 100%">
                     </p>
 
                     <h3>Modelagem dos dados</h3>
-                    <p> </p>
-
+                    <p>Com os dados devidamente arquivados dentro do banco de dados do PostgreSQL, devemos puxar as tabelas para dentro do Power BI e verificar as transformações necessárias:</p>
+                    <ul>
+                    <li>1 - Puxar tabela 'codint' e 'geral'</li>
+                    <li>2 - Criar chave para linkar tabela 'codint' com a 'geral'</li>
+                    </ul>
+                    <img src="/img/BI_modelagem_1.jpg" alt="" class="zoomE" style="max-width: 100%">
+                    <img src="/img/BI_modelagem_2_codint.jpg" alt="" class="zoomE" style="max-width: 100%">
+                    <img src="/img/BI_modelagem_2_geral.jpg" alt="" class="zoomE" style="max-width: 100%">
+                    <br>
+                    <p>Com os passos acima, temos os dados carregados na ferramenta e ambas tabelas se complementando.</p>
+                    <br>
                     <h3>Medidas extras</h3>
-                    <p> </p>
-
+                    <p>Mesmo com as tabelas carregadas, existem medidas que serão necessárias e que ainda não existem. Então para complementar os dados carregados e a partir deles são geradas as novas medidas.
+                        Dentro do Power BI, esta criação fica a cargo do conceito DAX (Data Analysis Expressions), que fornece uma biblioteca com diversas funções para criar estas medidas faltantes para analises.
+                    <br>
+                    <br>Dentro do projeto criamos algumas:
+                    <br>
+                    <br>
+                    <img src="/img/BI_medidas_DAX.jpg" alt="" class="zoomE" style="max-width: 100%">
+                    <br>
+                    <br>Medidas DAX:
+                    <div style = "height: auto; overflow-x: scroll;
+                    background-color: #d0cece">
+                        <pre style="color: #180ee0">
+                            <code>
+        Saldo_a_vencer = CALCULATE(sum(geral[saldo]), geral[status_saldo]="A VENCER")
+        
+        Saldo_a_vencer_PF = CALCULATE(sum(geral[saldo]),geral[tipo_carteira]="PF", geral[status_saldo]="A VENCER")
+        
+        Saldo_a_vencer_PJ = CALCULATE(sum(geral[saldo]),geral[tipo_carteira]="PJ", geral[status_saldo]="A VENCER")
+        
+        Saldo_geral = CALCULATE(SUM(geral[saldo]))
+        
+        Saldo_PF = CALCULATE(SUM(geral[saldo]), geral[tipo_carteira]={"PF"})
+        
+        Saldo_PJ = CALCULATE(SUM(geral[saldo]), geral[tipo_carteira]={"PJ"})
+        
+        Saldo_vencido = CALCULATE(sum(geral[saldo]), geral[status_saldo]="VENCIDO")
+        
+        Saldo_vencido_PF = CALCULATE(sum(geral[saldo]),geral[tipo_carteira]="PF", geral[status_saldo]="VENCIDO")
+        
+        Saldo_vencido_PF_perc = CALCULATE(sum(geral[saldo]),geral[tipo_carteira]="PF", geral[status_saldo]="VENCIDO")/CALCULATE(sum(geral[saldo]),geral[tipo_carteira]="PF")
+        
+        Saldo_vencido_PJ = CALCULATE(sum(geral[saldo]),geral[tipo_carteira]="PJ", geral[status_saldo]="VENCIDO")
+        
+        Saldo_vencido_PJ_perc = CALCULATE(sum(geral[saldo]),geral[tipo_carteira]="PJ", geral[status_saldo]="VENCIDO")/CALCULATE(sum(geral[saldo]),geral[tipo_carteira]="PJ")
+                            </code>
+                        </pre>
+                    </div>
+                    </p>
                     <h2>Conclusão</h2>
                     <h3>Resultados</h3>
                     <p>	

@@ -155,16 +155,19 @@ nav .nav-list li.btn:hover a{
     padding-left: 40px;
 }
 
+.container .proj-text div{
+    height: 50vh; overflow-y: scroll;
+    background-color: #101010;
+}
+
 .container .proj-text pre{
     display: table;
     table-layout: fixed;
     font-size: 14px; 
     line-height: 20px;
-    width: 100%;
-    background-color: #101010;
+    width: auto;
     font-family: 'Courier New', Courier, monospace;
-    color: #0acd1a;
-    white-space: pre-wrap;    
+    color: #0acd1a;  
 }
 
 .container .proj-text button{
