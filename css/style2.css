@@ -223,17 +223,7 @@ nav .nav-list li.btn:hover a{
         top: 0;
     }
     nav .nav-list{
-        position: absolute;
-        top: 90px;
-        right: -65%;
-        bottom: 0;
-        width: 60%;
-        height: 50%;
-        background: black;
-        z-index: 2;
-        padding: 6% 9%;
-        transition: .3s right;
-        border-radius: 10px;
+        display: none;        
     }
     nav .nav-list li{
         display: block;
@@ -256,5 +246,16 @@ nav .nav-list li.btn:hover a{
     }
     nav .nav-list.open{
         right: 0;
+        display: inline-block;
+        position: absolute;
+        top: 90px;
+        bottom: 0;
+        width: 60%;
+        height: 50%;
+        background: black;
+        z-index: 999;
+        padding: 6% 9%;
+        transition: .3s right;
+        border-radius: 10px;
     }
 }
