@@ -17,10 +17,7 @@ setTimeout(() => {
     p2.style.visibility = 'visible';
 }, 11000); // 👈️ delay in milliseconds
 
-setTimeout(() => {
-    const p3 = document.getElementById('p3');
-    p3.style.visibility = 'visible';
-}, 13000); // 👈️ delay in milliseconds
+
 
 //ZOOM IMAGE
 window.onload = () => {
