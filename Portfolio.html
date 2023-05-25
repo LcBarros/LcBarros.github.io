@@ -43,7 +43,7 @@
             <div class="container">
                 <div class="port-text">
                     <h3><span class="input1"></span></h3>
-                    <p><span class="input11"></span></p>
+                    <p><span defer class="input11"></span></p>
                     <button1 type="button" id="p1" onclick="location.href='Projeto1.html'">Acessar Projeto 1</button1><br><br>
                     <h3><span class="input2"></span></h3>
                     <p><span class="input21"></span></p>
@@ -61,53 +61,53 @@
 
     <script type="text/javascript" src="js/script.js"></script>
     <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+
     <script>
         var typed = new Typed(".input1", {
             strings: ["Projeto 1  - ETL e Analise de dados com Python"],
             typeSpeed: 15,
             loop: false,
-            showCursor: false
-            
-        });
-        var typed = new Typed(".input11", {
-            strings: ["Este projeto visa aplicar os conceitos de ETL (Extract, Transform e Load) e análise de dados utilizando python."],
-            startDelay: 3000,
-            typeSpeed: 15,
-            loop: false,
-            autoInsertCss: true,
-            showCursor: false
-            
-        })
-    </script>
-    <script>
-        var typed = new Typed(".input2", {
-            strings: ["Projeto 2 - Data Visualization com Power BI"],
-            typeSpeed: 15,
-            loop: false,
-            showCursor: false
-        });
-        var typed = new Typed(".input21", {
-            strings: ["Este projeto visa aplicar os conceitos de data visualization utilizando uma ferramenta de BI (Bussiness Intelligence)"],
-            startDelay: 3000,
-            typeSpeed: 15,
-            loop: false,
-            showCursor: false
-        })
-    </script>
-    <script>
-        var typed = new Typed(".input3", {
-            strings: ["Projeto 3 - Pipeline com Airflow"],
-            typeSpeed: 15,
-            loop: false,
-            showCursor: false
-        });
-        var typed = new Typed(".input31", {
-            strings: ["Em desenvolvimento"],
-            startDelay: 3000,
-            typeSpeed: 15,
-            loop: false,
-            showCursor: false
-        })
+            showCursor: false,
+            onComplete: function () {
+                var typed = new Typed(".input11", {
+                strings: ["Este projeto visa aplicar os conceitos de ETL (Extract, Transform e Load) e análise de dados utilizando python."],
+                typeSpeed: 15,
+                loop: false,
+                showCursor: false,
+                onComplete: function () {
+                    const p1 = document.getElementById('p1');
+                    p1.style.visibility = 'visible';
+                    var typed = new Typed(".input2", {
+                    strings: ["Projeto 2 - Data Visualization com Power BI"],
+                    typeSpeed: 15,
+                    loop: false,
+                    showCursor: false, 
+                    onComplete: function () {
+                        var typed = new Typed(".input21", {
+                        strings: ["Este projeto visa aplicar os conceitos de data visualization utilizando uma ferramenta de BI (Bussiness Intelligence)"],
+                        typeSpeed: 15,
+                        loop: false,
+                        showCursor: false,
+                        onComplete: function () {
+                            const p2 = document.getElementById('p2');
+                            p2.style.visibility = 'visible';
+                            var typed = new Typed(".input3", {
+                            strings: ["Projeto 3 - Pipeline com Airflow"],
+                            typeSpeed: 15,
+                            loop: false,
+                            showCursor: false,
+                            onComplete: function () {
+                                var typed = new Typed(".input31", {
+                                strings: ["Em desenvolvimento"],
+                                typeSpeed: 15,
+                                loop: false,
+                                showCursor: false
+                            })}
+                        })}
+                    })}                
+                })}
+            })}
+        })     
     </script>
 </body>
 </html>

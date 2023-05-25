@@ -42,42 +42,55 @@
 
             <div class="container">
                 <div class="hero-text">
-                    <h3>Bem vindo!!</h3>
-                    <h1>Me chamo <span class="input1"></span></h1>
+                    <h3 class=input0></h3>
+                    <h1 class="input1"></h1>
                     <p class="input2"></p>
                     <div class="social">
-                        <a href="https://www.linkedin.com/in/lucas-barros-aa06557b/"><i class="fa-brands fa-linkedin" style="color: #ffffff;"></i></a>
-                        <a href="https://github.com/LcBarros?tab=projects"><i class="fa-brands fa-square-github" style="color: #ffffff;"></i></a>
-                        <a href="mailto:lucasbrrsilva@gmail.com"><i class="fa-sharp fa-solid fa-envelope" style="color: #ffffff;"></i></a>
+                        <a id="social1" href="https://www.linkedin.com/in/lucas-barros-aa06557b/"><i class="fa-brands fa-linkedin" style="color: #ffffff;"></i></a>
+                        <a id="social2" href="https://github.com/LcBarros?tab=projects"><i class="fa-brands fa-square-github" style="color: #ffffff;"></i></a>
+                        <a id="social3" href="mailto:lucasbrrsilva@gmail.com"><i class="fa-sharp fa-solid fa-envelope" style="color: #ffffff;"></i></a>
                     </div>
                     <button type="button" onclick="location.href='Portfolio.html'" id="botaoportfolio">Acessar Portfolio</button>
                 </div>
-                <div class="bottom">
-                    <p>@ 2023 Lucas - All Rights Reserved.</p>
-                </div>
             </div>
         </div>
-
     </section>
+    <footer id="footer">
+        <p>@ 2023 Lucas - All Rights Reserved.</p>
+   </footer>
 
     <script type="text/javascript" src="js/script.js"></script>
     <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
     <script>
-        var typed = new Typed(".input1", {
-            strings: ["Lucas Barros da Silva."],
+        var typed = new Typed(".input0", {
+            strings: ["Bem vindo!!"],
             typeSpeed: 70,
             loop: false,
-            showCursor: false
-            
-        })
-    </script>
-    <script>
-        var typed = new Typed(".input2", {
-            strings: ["^2500 Criei este site para divulgar meus projetos de: <br> Data Analyst &nbsp;&bull;&nbsp; Data Engineer &nbsp;&bull;&nbsp; Machine Learning &nbsp;&bull;&nbsp; Robotic Process Automation"],
-            typeSpeed: 15,
-            loop: false,
-            showCursor: false
-        })
+            showCursor: false,
+            onComplete: function () {
+            var typed = new Typed(".input1", {
+                strings: ["Me chamo <span>Lucas Barros da Silva.</span>"],
+                typeSpeed: 30,
+                loop: false,
+                showCursor: false,
+                onComplete: function () {
+                    var typed = new Typed(".input2", {
+                        strings: ["Criei este site para divulgar meus projetos de: <br> Data Analyst &nbsp;&bull;&nbsp; Data Engineer &nbsp;&bull;&nbsp; Machine Learning &nbsp;&bull;&nbsp; Robotic Process Automation"],
+                        typeSpeed: 15,
+                        loop: false,
+                        showCursor: false,
+                        onComplete: function () {
+                                        const social1 = document.getElementById('social1');
+                                        const social2 = document.getElementById('social2');
+                                        const social3 = document.getElementById('social3');
+                                        const botaoportfolio = document.getElementById('botaoportfolio');
+                                        setTimeout(function() {social1.style.visibility = 'visible'}, 0000);
+                                        setTimeout(function() {social2.style.visibility = 'visible'}, 500);
+                                        setTimeout(function() {social3.style.visibility = 'visible'}, 1000);
+                                        setTimeout(function() {botaoportfolio.style.visibility = 'visible'}, 1500)}
+                    })}
+            })}
+        })  
     </script>
 </body>
 </html>

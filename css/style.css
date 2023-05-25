@@ -21,7 +21,7 @@ body{
     background: url(../img/backgroundxxx.jpg);
     background-size: cover;
     background-position: center;
-    position: relative;
+    position: absolute;
 }
 header{
     padding: 40px 0 30px;
@@ -153,6 +153,7 @@ nav .nav-list li.btn:hover a{
     margin-left: 20px;
     background-color: rgba(255, 255, 255, 0.1);
     margin-bottom: 35px;
+    visibility: hidden;
 
 }
 .social a:hover{
@@ -169,7 +170,8 @@ nav .nav-list li.btn:hover a{
     padding: 8px 30px;
     border-radius: 30px;
     border: 2px solid #2ecc71;
-    cursor: pointer
+    cursor: pointer;
+    visibility: hidden;
 }
 .container .hero-text button:hover{
     background: transparent;
@@ -177,12 +179,16 @@ nav .nav-list li.btn:hover a{
     color:#2ecc71;
     transition: .4s;
 }
-.container .bottom{
-    margin-top: 243px;
-    padding-bottom: 40px;
+footer{
+
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    margin: 40px;
+
 }
 
-.container .bottom p{
+footer p{
 
     width: 440px;
     max-width: 100%;
@@ -425,12 +431,14 @@ nav .nav-list li.btn:hover a{
         color:#2ecc71;
         transition: .4s;
     }
-    .container .bottom{
-        margin-top: 200px;
-        padding-bottom: 40px;
+    footer {
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        margin: 40px;
     }
     
-    .container .bottom p{
+    footer p{
     
         width: 330px;
         max-width: 100%;

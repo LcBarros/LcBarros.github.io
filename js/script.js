@@ -7,15 +7,7 @@ hamburger.addEventListener("click", function(){
     navlist.classList.toggle("open")
 })
 
-setTimeout(() => { 
-    const p1 = document.getElementById('p1');
-    p1.style.visibility = 'visible';
-}, 9000); // 👈️ delay in milliseconds
 
-setTimeout(() => {
-    const p2 = document.getElementById('p2');
-    p2.style.visibility = 'visible';
-}, 11000); // 👈️ delay in milliseconds
 
 
 
